@@ -1,0 +1,5 @@
+require('dotenv/config');
+require('./../index.js');
+require('./../routes/clarifai.js');
+require('./../routes/firebase.js');
+require('./../routes/tomtom.js');
