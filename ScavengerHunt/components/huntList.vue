@@ -1,7 +1,7 @@
 <template>
     <view >
         <view v-bind:key="hunt.id" v-for="hunt in hunts">
-            <Hunt v-bind:hunt="hunt" />
+            <Hunt v-bind:hunt="hunt" v-on:hunt-selected="$emit('hunt-selected',hunt)" />
         </view>
     </view>
 </template>

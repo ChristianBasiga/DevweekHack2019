@@ -2,11 +2,15 @@
     <view>
         <camera ref="camera">
             <view :style = "{width:wp,height:hp, position:'relative'}" >
-        <button
-            class = "takePictureButton"
-            :on-press="takePicture"
-            title="Take Picture"
-        />
+                <button
+                    class = "takePictureButton"
+                    :on-press="takePicture"
+                    title="Take Picture"
+                />
+                <button
+                    :on-press="toggleParticipant"
+                    title="Participant Toggle"
+                />
             </view>
         </camera>
     </view>
@@ -15,6 +19,9 @@
 <script>
 import {Camera, Permissions} from "expo";
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
+import {Alert} from 'react-native';
+import axios from 'axios';
+import uuid from "uuid/v4";
 
 export default {
     name: 'CameraScreen',
@@ -24,7 +31,10 @@ export default {
         },
         navigation: {
             type: Object
-        }
+        },
+        matchedLabel: {
+            type: Object
+        },
     },
     data: function(){
         return{
@@ -32,7 +42,11 @@ export default {
             type: Camera.Constants.Type.back,
             wp:wp('100%'),
             hp:hp('100%'),
-            picturesTaken: []
+            picturesTaken: [],
+            selectedHunt: null,
+            thumbNailIndex: 0,
+            newItem = null,
+            itemName = ""
         }
     },
     mounted: function(){
@@ -43,30 +57,114 @@ export default {
                 console.log(err);
             });
     },
+    created(){
+        
+    },
     methods:{
+        participantConfirmation(){
+            Alert.alert(
+                "Confirmation",
+                "Are you sure?",
+                [
+                    {text: 'Yes', onPress: () => comparePicture()},
+                    {text: 'No', onPress: () => console.log("No")}
+                ],
+                {cancelable: false}
+            );
+        },
+        comparePicture(){
+            axios.post('localhost:8080/comparePhoto',{
+                huntId: this.selectedHunt.id,
+                photo: this.picturesTaken[0],
+                items: this.selectedHunt.items
+            })
+            .then(res => {
+                this.matchedLabel = res;
+            })
+            .catch((err)=>{
+                console.log(err);
+            });
+
+            if(this.matchedLabel === null){
+                alert("Picture did not match");
+            }
+            else{
+                alert("Matched a concept");
+            }
+        },
+        toggleParticipant(){
+            this.isParticipant = !this.isParticipant;
+            this.picturesTaken = [];
+            if(this.isParticipant){
+                alert("Participant");
+            }
+            else{
+                alert("Creator");
+            }
+        },
         takePicture(){
-                const options = {
-                    base64: true,
-                }
-                this.$refs.camera.takePictureAsync(options)
-                    .then(result => {
-                        console.log(result);
-                        const {params} = this.navigation.state; // Sets params to object passed through navigation
-                        this.isParticipant = params.isParticipant;
-                        console.log(this.isParticipant);
-                        
-                        if(this.isParticipant){
-                            this.picturesTaken = result; 
-                        }
-                        else{ //Creator.
+            const options = {
+                base64: true,
+            }
+            this.$refs.camera.takePictureAsync(options)
+                .then(result => {
+                    console.log(result);
+                    const {params} = this.navigation.state; // Sets params to object passed through navigation
+                    this.isParticipant = params.isParticipant;
+                    console.log(this.isParticipant);
+                    
+                    if(this.isParticipant){
+                        this.selectedHunt = params.selectedHunt;
+                        if(this.picturesTaken.length == 0){
                             this.picturesTaken = this.picturesTaken.concat(result);
                         }
-                    })
-                    .catch((err)=>{
-                        console.log(err);
-                    });
-                
-        }
+                        else{
+                            this.picturesTaken[0] = result; 
+                        }
+                    }
+                    else{ //Creator.
+                        this.picturesTaken = this.picturesTaken.concat(result);
+                    }
+                })
+                .catch((err)=>{
+                    console.log(err);
+                });
+            if(this.isParticipant){
+                participantConfirmation();
+            }
+            else if(this.picturesTaken.length == 5){
+                chooseThumbnail();
+                addItem();
+            }
+        },
+        addItem(){
+            this.newItem = {
+                id: uuid(),
+                name: this.itemName,
+                thumbnail: null
+            }
+            axios.post("localhost:8080/addItemToHunt", {
+                huntId: this.selectedHunt.id,
+                photosOfItem: this.picturesTaken,
+                item: this.newItem,
+                thumbnail: this.picturesTaken[this.thumbNailIndex]
+            })
+            .catch(err => console.log(err))
+        },
+        chooseThumbnail(){
+            Alert.alert(
+                "Choose Thumbnail",
+                "Pick 1-5",
+                [
+                    {text: '1', onPress: () => this.thumbNailIndex = 0},
+                    {text: '2', onPress: () => this.thumbNailIndex = 1},
+                    {text: '3', onPress: () => this.thumbNailIndex = 2},
+                    {text: '4', onPress: () => this.thumbNailIndex = 3},
+                    {text: '5', onPress: () => this.thumbNailIndex = 4}
+                ],
+                {cancelable: false}
+            );
+        },
     },
     components:{
         Camera
