@@ -8,6 +8,11 @@
         <marker  v-if = "region != null" :description = "'h'" :title = "'my location'"  
         :coordinate = "{latitude: region.latitude, longitude: region.longitude}"/>
 
+
+        <circle v-for="fence in loadedFences" :key="fence.id" :center="{latitude:fence.coordinates.latitude, 
+        longitude: fence.coordinates.longitude}"
+         :radius="fence.size"/>
+
         <circle v-for="fence in fences" :key="fence.id" :center="{latitude:fence.coordinates.latitude, 
         longitude: fence.coordinates.longitude}"
          :radius="fence.size"/>
@@ -15,11 +20,12 @@
 
         </map-view>
         <!-- Could be visually made better, but that's not the point-->
-        
-        <circle-form v-on:create-fence = "createFence" v-on:close-editor="closeEditor" :coords="selectedLocation"/>
 
-        <button :on-press = "createFences"> Add Fences </button>
-
+        <view class = "uiContainer">
+        <circle-form v-if="editing" :submit = "createFence" :close="closeEditor" :coords="selectedLocation"/>
+        <button class = "button" v-if="!editing" :on-press="openEditor" :title ="'Edit Fences'"/>
+        <button class = "submitButton" v-if="fences.length > 0" :on-press = "createFences" :title="'Submit Fences'"/>
+        </view>
     </view>
 </template>
 
@@ -38,11 +44,14 @@ const longitudeDelta = 0.0922;
 const latitudeDelta = longitudeDelta *  aspectRatio;
 let id = 0;
 var EditEnum =  Object.freeze({"Corridor": 0, "Circle": 1, "Square":1 })
+const backendUrl = "http://localhost:8080";
 export default {
     name: 'MapScreen',
     data(){
 
        
+
+        const loadedFences = [];//this.selectedHunt.fences;
 
         return {
             //current location.
@@ -54,7 +63,8 @@ export default {
             editing:false,
             width:width,
             height:height,
-            selectedLocation:null
+            selectedLocation:null,
+            loadedFences
 
 
            
@@ -87,9 +97,21 @@ export default {
     methods:{
 
 
+        openEditor(){
+
+            
+            this.editing = true;
+        },
         onChangeDrawMode(newMode){
 
             this.drawing = EditEnum[newMode];
+        },
+
+        scan(){
+
+            //Sends report request to server.
+
+            axios.get(backendUrl+"/")
         },
 
 
@@ -104,9 +126,11 @@ export default {
         createFence(type,name, size){
 
 
-            const newFence = {id:id++, type,name, size, coordinates: selectedLocation};
+            console.log("map emitted to ", type, name, size);
+            console.log("selected location", this.selectedLocation);
+            const newFence = {id:id++, type,name, size, coordinates: this.selectedLocation};
             this.fences = this.fences.concat(newFence);
-
+            this.editing = false;
         },
 
         createFences(){
@@ -115,7 +139,7 @@ export default {
 
             //Ideally I batch all of these, and send. Don't think I have that yet.
 
-            axios.post("/addFences",{
+            axios.post(backendUrl+"/addFences",{
                 huntId:this.selectedHunt.id,
                 fences
             })
@@ -194,9 +218,18 @@ export default {
 
 <style scoped>
 
+.uiContainer{
+
+    position: absolute;
+}
+
 .button{
 
     position: absolute;
+}
+.submitButton{
+    position: absolute;
+    bottom:0;
 }
 
 </style>
