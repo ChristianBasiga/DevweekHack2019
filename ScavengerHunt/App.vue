@@ -12,10 +12,7 @@ import HomeScreen from "./screens/homeScreen.vue";
 import CameraScreen from "./screens/cameraScreen.vue";
 import MapScreen from "./screens/mapScreen.vue";
 
-import Vue from 'vue-native-core'
-import HTML from 'react-native-render-html'
 
-Vue.component('html', HTML)
 const AppNavigation = StackNavigator(
   {
     Map: MapScreen,

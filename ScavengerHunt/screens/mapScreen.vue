@@ -1,8 +1,11 @@
 <template>
     <view>
 
-        <map-view :style = "{width:width,height:height}" :region = "region" />
-        <marker  v-if = "region != null" class = "locationMarker" :description = "'h'" :title = "'my location'"     coordinate = "{latitude: region.latitude, longitude: region.longitude}"/>
+        <map-view :style = "{width:width,height:height}" :region = "region" >
+        <marker  v-if = "region != null" class = "locationMarker" :description = "'h'" :title = "'my location'"  :coordinate = "{latitude: region.latitude, longitude: region.longitude}"
+        />
+        </map-view>
+
     </view>
 </template>
 
@@ -27,6 +30,7 @@ export default {
             fences:[],
             width,
             height,
+           
         };
     },
 
