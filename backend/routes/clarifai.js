@@ -16,10 +16,16 @@ const clarifai = new Clarifai.App({
 app.post("/comparePhoto", async (req,res) => {
 
     //items are items in hunt list,
-    //Items will be just their ids. 
+    //Items will 
     const {huntId, photo, items } = req.body;
 
 
+    const selectedConcepts = [];
+
+    items.forEach(item => {
+
+        selectedConcepts.push(item.id);
+    })
     clarifai.models.get(huntId)
         .then (model => {
 
@@ -182,4 +188,6 @@ app.post("/addItemToHunt", async (req,res) => {
         });
 
 });
-//Image post to send back concepts from clarifai to client.
+
+
+modules.export=clarifai;
