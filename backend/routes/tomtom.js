@@ -148,7 +148,59 @@ app.post("/registerUser", (req, res) => {
 
 });
 
+app.post("/createFences", (req,res)=>{
 
+
+    console.log("body in creating fence", req.body);
+    const {huntId, fences} = req.body;
+
+    const url = baseURL + "/projects/"+huntId+"/fence?"+keyParams.api+"&"+keyParams.admin;
+
+    fences.forEach(fence => {
+
+        console.log("fence", fence);
+        axios.post(url, {
+            name: fence.name,
+            type:"Feature",
+            geometry:{
+
+                radius:fence.size,
+                type:"Point",
+                shapeType:fence.type,
+                coordinates:fence.coordinates
+            }
+        })
+        .then(createdFence => {
+
+            console.log("created fence" ,createdFence.data.id);
+
+            //Then I want to store the id so I can retrieve later from firestore.
+
+            //Still just do collection, cleaner than field array.
+            const huntRef = firebase.firestore().collection("ScavengerHunts").doc(huntId).collection("Fences")
+            .doc(createdFence.data.id);
+
+            //Need coords and size in firestore to display on gui, don't need rest of fence info.
+            huntRef.set(fence)
+            .then(newEntry => {
+
+                console.log(" new entry in firestore", newEntry);
+                res.send({result:"Created new fence"})
+            });
+
+
+        })
+        .catch(err => {
+
+            console.log("error", err);
+        })
+    })
+   
+
+
+
+
+})
 app.get("/checkObjectFencing", (req,res) => {
 
 

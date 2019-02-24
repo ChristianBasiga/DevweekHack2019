@@ -117,7 +117,7 @@ app.post("/comparePhoto", async (req,res) => {
 app.post("/addItemToHunt", async (req,res) => {
 
     
-    const {huntId, photosOfItem, item, thumbnailIndex} = req.body;
+    const {huntId, photosOfItem, item, thumbnail} = req.body;
     //Adds item's model id to firestore doc of the hunt.
 
     //Gotta make sure to set option when taking photo to be base64.
@@ -171,7 +171,7 @@ app.post("/addItemToHunt", async (req,res) => {
 
                 id: item.id,
                 name: item.name,
-                thumbnail:thumbnailIndex
+                thumbnail:thumbnail
 
             });
                 
