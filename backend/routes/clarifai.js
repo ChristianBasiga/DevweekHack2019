@@ -35,8 +35,8 @@ app.post("/comparePhoto", async (req,res) => {
             //Predict only based on items on list, this actually makes it much easier to choose.
             //Selected concepts is just redundant.
 
-            model.predict({base64: photo, selectedConcepts: items, minValue: 0.40})
-                .then (prediction => {
+            model.predict({base64: photo, selectedConcepts: items, minValue: 0.60})
+                .then ( async prediction => {
 
                     //Need to see what this output would be
                     //Likely shows confidence
@@ -150,7 +150,7 @@ app.post("/addItemToHunt", async (req,res) => {
 
     //Dependant on user making sure to take same picture.
     clarifai.models.get({model_id:huntId})
-        .then (model => {
+        .then (async model => {
 
             //then add the concept to model.
             //block here cause want concepts before train.
@@ -195,4 +195,4 @@ app.post("/addItemToHunt", async (req,res) => {
 });
 
 
-modules.export=clarifai;
+module.exports=clarifai;

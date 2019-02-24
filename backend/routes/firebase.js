@@ -14,7 +14,7 @@ var config = {
   };
 
 
-const firebase = firebase.initializeApp(config);
+const firebase = Firebase.initializeApp(config);
 
 
 expressApp.get("/getAllHunts", (req, res) => {

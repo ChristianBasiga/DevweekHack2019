@@ -4,7 +4,7 @@ const firebase = require('firebase');
 const adminKey = process.env.TOMTOM_ADMIN_KEY;
 const apiKey = process.env.TOMTOM_API_KEY;
 
-const clarifai = require('./clarifai');
+const clarifai = require('./clarifai.js');
 const baseURL = "https://api.tomtom.com/geofencing/1";
 
 //In meters
@@ -20,54 +20,46 @@ const keyParams = {
 
 //Creates hunt on firestore, project on tomtom, and model in clarifai.
 //NEED TO REORGANIZE FILES BETTER LATER, kinda messy now.
-app.post("/createHunt", (req,res) => {
+app.post("/createHunt", async (req,res) => {
 
 
     const {huntName} = req.body;
 
+
+    try{
     //This will init project from tomtom api.
-    axios.post(baseURL + "/projects/project?" + keyParams.api + "&" + keyParams.admin,
+    const project = await axios.post(baseURL + "/projects/project?" + keyParams.api + "&" + keyParams.admin,
         {
 
             name: huntName
-        })
-        .then (project => {
+        });
+    
+       
 
+    console.log("project id", project.data.id);
 
-                //Then after project created store into collection in firestore.
-
-                const firestore = firebase.firestore();
-                const scavCollection = firestore.collection("ScavengerHunts");
+    const firestore = firebase.firestore();           
+    const scavCollection = firestore.collection("ScavengerHunts");
 
                 //Also need the clarify here, creating different scripts almost irrelvant now.
 
-
-                scavCollection.doc(project.data.id).set({
-                    items:["concept"]
-                })
-                .then (response => {
-
+    await scavCollection.doc(project.data.id).set({               
+         name: huntName
+    })
                     
                     //Might make this model also be uuid, but that's optimization.
-                    clarifai.models.create(huntName)
-                        .then (
-                            model => {
+        
+    
+    const model = await clarifai.models.create({id: project.data.id, name:huntName})
+                      
+    console.log("model", model);
 
-                                //Only send if all parts were created correctly.
-                                //
-                                res.send({project:project.data});
+    res.send(project.data);
+    }
+    catch(error) {
+        console.log("error",error);
+    }
 
-                            }
-
-                        )
-
-                });
-             
-        })
-        .catch(err => {
-
-            res.send({error:err})
-        });
 });
 
 
@@ -122,6 +114,7 @@ app.get("/joinHunt", async (req,res) => {
     catch(err) {
 
         console.log("error", err);
+        res.send({error:"Failed to create scavenger hunt"});
     }
 });
 
@@ -150,7 +143,7 @@ app.post("/registerUser", (req, res) => {
     })
     .catch(err => {
 
-        console.log("error",err);
+        
 
     });
 
