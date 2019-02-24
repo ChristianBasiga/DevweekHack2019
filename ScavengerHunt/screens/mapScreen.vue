@@ -1,10 +1,21 @@
 <template>
     <view>
 
-        <map-view :style = "{width:width,height:height}" :region = "region" >
-        <marker  v-if = "region != null" class = "locationMarker" :description = "'h'" :title = "'my location'"  :coordinate = "{latitude: region.latitude, longitude: region.longitude}"
-        />
+        <map-view :style = "{width:width,height:height}" :region = "region"    :on-press = "onPress" >
+
+        <polygon  v-for="fence in fences" :key="fence.id" :coordinates = "fence.coordinates" :holes = "fence.holes"
+        :stroke-color="'#F00'" :fill-color="'rgba(255,0,0,0.5)'" :stroke-width="1"/>
+
+        <polygon v-if="editing != null" :key = "editing.key" :coordinates="editing.coordinates" :holes = "editing.holes"
+          :stroke-color="'#F00'" :fill-color="'rgba(255,0,0,0.5)'" :stroke-width="1"/>
+
+        <marker  v-if = "region != null" :description = "'h'" :title = "'my location'"  
+        :coordinate = "{latitude: region.latitude, longitude: region.longitude}"/>
+
+
         </map-view>
+
+        <rect-form/>
 
     </view>
 </template>
@@ -12,24 +23,36 @@
 <script>
 
 import {MapView, Location, Permissions} from 'expo';
+import RectForm from '../components/rectForm.vue';
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
-
-const {Marker, Polygon, Circle}  = MapView;
+import axios from 'axios';
+const {Marker, Square, Circle}  = MapView;
 var subscription = null;
+ const width = wp('100%');
+const height = hp('100%');
+const aspectRatio = width / height;
+const longitudeDelta = 0.0922;
+const latitudeDelta = longitudeDelta *  aspectRatio;
+let id = 0;
+var EditEnum =  Object.freeze({"Corridor": 0, "Circle": 1, "Square":1 })
 export default {
     name: 'MapScreen',
-    subscription:null,
     data(){
 
+       
 
-        const width = wp('100%');
-        const height = hp('100%');
         return {
             //current location.
             region: null,
+
+            //Fences will be polygons and others.
             fences:[],
-            width,
-            height,
+            drawing:EditEnum.Square,
+            editing:null,
+            width:width,
+            height:height,
+
+
            
         };
     },
@@ -37,6 +60,8 @@ export default {
     mounted(){
 
         this.listenToLocation();
+
+        //Also need to take in from prop, current fences to display.
     },
     
     beforeDestroy(){
@@ -49,11 +74,68 @@ export default {
     props:{
         navigation:{
             type: Object
+        },
+        selectedHunt:{
+            type: Object
         }
     },
 
     methods:{
 
+
+        onChangeDrawMode(newMode){
+
+            this.drawing = EditEnum[newMode];
+        },
+
+
+        finish(){
+
+            this.fences = [...this.fences, this.editing];
+            this.editing = null;
+        },
+
+        createFences(){
+
+            const fences = this.fences;
+
+            //Ideally I batch all of these, and send. Don't think I have that yet.
+
+            axios.post("/addFences",{
+                huntId:this.selectedHunt.id,
+                fences
+            })
+            .then( response => {
+
+                console.log("response", response);
+            })
+            .catch(err => {
+
+                console.log("error", err);
+            });
+
+        },
+
+       
+        onPress(e){
+
+
+            const coords = e.nativeEvent.coordinate;
+
+            if (!this.editing){
+
+
+                this.editing = {
+                    id: id++,
+                    coordinates: [coords],
+                    holes:[]
+                };
+
+                this.scrollEnabled = false;
+            }
+    
+           
+        },
         onLocationChange(region){
 
           //  this.region = region;
@@ -79,8 +161,8 @@ export default {
 
                             latitude: coords.latitude,
                             longitude: coords.longitude,
-                            latitudeDelta: 0.0922,
-                            longitudeDelta: 0.0421
+                            longitudeDelta: longitudeDelta,
+                            latitudeDelta: latitudeDelta
                         };
                     })
                 
@@ -97,18 +179,18 @@ export default {
 
     components:{
         Marker, 
-        Polygon,
         Circle,
-        MapView
+        MapView,
+        RectForm
     }
 }
 </script>
 
-<style>
+<style scoped>
 
-.locationMarker{
+.button{
 
-    position:absolute;
+    position: absolute;
 }
 
 </style>
