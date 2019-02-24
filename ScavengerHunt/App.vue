@@ -11,16 +11,22 @@ import { StackNavigator } from "vue-native-router";
 import HomeScreen from "./screens/homeScreen.vue";
 import CameraScreen from "./screens/cameraScreen.vue";
 import MapScreen from "./screens/mapScreen.vue";
+
+import Vue from 'vue-native-core'
+import HTML from 'react-native-render-html'
+
+Vue.component('html', HTML)
 const AppNavigation = StackNavigator(
   {
+    Map: MapScreen,
     Home: HomeScreen,
     Camera: CameraScreen,
-    Map: MapScreen
   },
   {
-    initialrouteName: 'Home'
+    initialrouteName: 'Map'
   }
 );
+
 
 export default {
   components: { AppNavigation }
