@@ -11,14 +11,15 @@ import MapScreen from "./screens/mapScreen.vue";
 
 const AppNavigation = StackNavigator(
   {
+    Map: MapScreen,
     Home: HomeScreen,
     Camera: CameraScreen,
-    Map: MapScreen
   },
   {
     initialrouteName: 'Home'
   }
 );
+
 
 export default {
   components: { AppNavigation }
