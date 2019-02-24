@@ -3,11 +3,7 @@
 
         <map-view :style = "{width:width,height:height}" :region = "region"    :on-press = "onPress" >
 
-        <polygon  v-for="fence in fences" :key="fence.id" :coordinates = "fence.coordinates" :holes = "fence.holes"
-        :stroke-color="'#F00'" :fill-color="'rgba(255,0,0,0.5)'" :stroke-width="1"/>
-
-        <polygon v-if="editing != null" :key = "editing.key" :coordinates="editing.coordinates" :holes = "editing.holes"
-          :stroke-color="'#F00'" :fill-color="'rgba(255,0,0,0.5)'" :stroke-width="1"/>
+        
 
         <marker  v-if = "region != null" :description = "'h'" :title = "'my location'"  
         :coordinate = "{latitude: region.latitude, longitude: region.longitude}"/>
@@ -15,7 +11,8 @@
 
         </map-view>
 
-        <rect-form/>
+        <circle-form v-on:create-fence = "createFence"/>
+        <button :on-press = "createFences"> Add Fences </button>
 
     </view>
 </template>
@@ -23,7 +20,7 @@
 <script>
 
 import {MapView, Location, Permissions} from 'expo';
-import RectForm from '../components/rectForm.vue';
+import CircleForm from '../components/circleForm.vue';
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import axios from 'axios';
 const {Marker, Square, Circle}  = MapView;
@@ -93,6 +90,16 @@ export default {
 
             this.fences = [...this.fences, this.editing];
             this.editing = null;
+        },
+
+
+        //size could be radius or width & height
+        createFence(type,size){
+
+
+            const newFence = {type:type, size};
+            this.fences = this.fences.concat(newFence);
+
         },
 
         createFences(){
@@ -181,7 +188,7 @@ export default {
         Marker, 
         Circle,
         MapView,
-        RectForm
+        CircleForm
     }
 }
 </script>
