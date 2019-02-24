@@ -17,6 +17,7 @@ const keyParams = {
 
 
 
+//Todo later, delete hunt.
 
 //Creates hunt on firestore, project on tomtom, and model in clarifai.
 //NEED TO REORGANIZE FILES BETTER LATER, kinda messy now.
@@ -71,9 +72,6 @@ app.get("/joinHunt", async (req,res) => {
     const {projectId} = req.body;
     //body will have project id or id of scavenger hunt.
     const firestore = firebase.firestore();
-
-
-
     //For items.
     const huntCollection = firestore.collection("ScavengerHunts").doc(projectId).collection("Items");
 
