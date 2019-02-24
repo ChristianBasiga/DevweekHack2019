@@ -8,10 +8,16 @@
         <marker  v-if = "region != null" :description = "'h'" :title = "'my location'"  
         :coordinate = "{latitude: region.latitude, longitude: region.longitude}"/>
 
+        <circle v-for="fence in fences" :key="fence.id" :center="{latitude:fence.coordinates.latitude, 
+        longitude: fence.coordinates.longitude}"
+         :radius="fence.size"/>
+
 
         </map-view>
+        <!-- Could be visually made better, but that's not the point-->
+        
+        <circle-form v-on:create-fence = "createFence" v-on:close-editor="closeEditor" :coords="selectedLocation"/>
 
-        <circle-form v-on:create-fence = "createFence"/>
         <button :on-press = "createFences"> Add Fences </button>
 
     </view>
@@ -45,9 +51,10 @@ export default {
             //Fences will be polygons and others.
             fences:[],
             drawing:EditEnum.Square,
-            editing:null,
+            editing:false,
             width:width,
             height:height,
+            selectedLocation:null
 
 
            
@@ -89,15 +96,15 @@ export default {
         finish(){
 
             this.fences = [...this.fences, this.editing];
-            this.editing = null;
+            this.editing = false;
         },
 
 
         //size could be radius or width & height
-        createFence(type,size){
+        createFence(type,name, size){
 
 
-            const newFence = {type:type, size};
+            const newFence = {id:id++, type,name, size, coordinates: selectedLocation};
             this.fences = this.fences.concat(newFence);
 
         },
@@ -128,20 +135,12 @@ export default {
 
 
             const coords = e.nativeEvent.coordinate;
+            this.selectedLocation = coords;
+        },
 
-            if (!this.editing){
+        closeEditor(){
 
-
-                this.editing = {
-                    id: id++,
-                    coordinates: [coords],
-                    holes:[]
-                };
-
-                this.scrollEnabled = false;
-            }
-    
-           
+            this.editing = false;
         },
         onLocationChange(region){
 
