@@ -24,7 +24,8 @@ app.post("/comparePhoto", async (req,res) => {
 
     items.forEach(item => {
 
-        selectedConcepts.push(item.id);
+        //Double check what selected concepts take.
+        selectedConcepts.push({id:item.id});
     })
     clarifai.models.get(huntId)
         .then (model => {
@@ -32,7 +33,9 @@ app.post("/comparePhoto", async (req,res) => {
 
             //See if can predit using base 64 format.
             //Predict only based on items on list, this actually makes it much easier to choose.
-            model.predict({base64: photo, selectedConcepts: items, minValue: 0.70})
+            //Selected concepts is just redundant.
+
+            model.predict({base64: photo, selectedConcepts: items, minValue: 0.40})
                 .then (prediction => {
 
                     //Need to see what this output would be
@@ -40,6 +43,7 @@ app.post("/comparePhoto", async (req,res) => {
                     console.log("prediction: ", prediction);
 
                     const potentialLabels = prediction.data.concepts;
+
                     if (potentialLabels.length == 0){
 
                         res.send({matched:null});
@@ -61,7 +65,6 @@ app.post("/comparePhoto", async (req,res) => {
                     }
 
 
-                    /*Ask for feedback of flow and understanding of this from mentors later.*/
 
 
                     res.send({matched: matchedLabel})
@@ -74,6 +77,8 @@ app.post("/comparePhoto", async (req,res) => {
                         const concept = {value:true, id: matchedLabel.id};
 
                         //Label photo user took with the correct match to further train the model.
+
+                        //This may really fuck up the model though.
                         await clarifai.inputs.create({
                             base64: photo,
                             concepts:concept
@@ -107,6 +112,7 @@ app.post("/comparePhoto", async (req,res) => {
 // project id of what hunt to add item to.
 // video / array of pictures (Video can be break into frames.) to train a model for the item
 //Restrict to be number of pictures, not video. The amount of frames will result in too many api calls.
+
 app.post("/addItemToHunt", async (req,res) => {
 
     
@@ -117,7 +123,7 @@ app.post("/addItemToHunt", async (req,res) => {
     //Creates inputs.
     //Just one concept for these photos
     
-    const concepts = [{id:item.id, name:item.name, value:true}];
+    const concepts = [{id:item.id, value:true}];
     const inputs = [];
 
     photosOfItem.forEach(photo => {
@@ -141,7 +147,7 @@ app.post("/addItemToHunt", async (req,res) => {
 
     //So project id in tomtom, id in firestore, and model id for clarifai will all be the same.
 
-    //
+    //Dependant on user making sure to take same picture.
     clarifai.models.get({model_id:huntId})
         .then (model => {
 
@@ -150,13 +156,11 @@ app.post("/addItemToHunt", async (req,res) => {
 
             //I add concept to model, and it gets trained by input with that model.
             //that I set above so it learns to predict the same way the inputs did based on pictures
-            //so input is there for all models, this may end up being innacurate but thnk right.
             await  model.mergeConcepts(concepts);
-
-
             
             //After merge concepts, add that to collection in firestore.
-
+            //Actually need storage too, will send image that the item will be url of that
+            //instead of just concept name
             const firestore = firebase.firestore();
             const itemsRef = firestore.collection("ScavengerHunts").doc(huntId).collection("Items")
 
@@ -164,7 +168,6 @@ app.post("/addItemToHunt", async (req,res) => {
             //Regardless want this to deleting items is easy.
             itemsRef.doc(item.id).set({
 
-                //redundant take out later or add to object doc id.
                 id: item.id,
                 name: item.name
 
