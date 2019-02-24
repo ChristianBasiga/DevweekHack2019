@@ -149,6 +149,21 @@ app.post("/addItemToHunt", async (req,res) => {
 
 
             
+            //After merge concepts, add that to collection in firestore.
+
+            const firestore = firebase.firestore();
+            const itemsRef = firestore.collection("ScavengerHunts").doc(huntId).collection("Items")
+
+            //Array or collection of docs?
+            //Regardless want this to deleting items is easy.
+            itemsRef.doc(item.id).set({
+
+                //redundant take out later or add to object doc id.
+                id: item.id,
+                name: item.name
+
+            });
+                
                 
             model.train()
                 .then (response => {
