@@ -113,10 +113,11 @@ app.post("/comparePhoto", async (req,res) => {
 // video / array of pictures (Video can be break into frames.) to train a model for the item
 //Restrict to be number of pictures, not video. The amount of frames will result in too many api calls.
 
+//For this, make sure upload thumbnail index's base64 as part of item in firestore.
 app.post("/addItemToHunt", async (req,res) => {
 
     
-    const {huntId, photosOfItem, item} = req.body;
+    const {huntId, photosOfItem, item, thumbnailIndex} = req.body;
     //Adds item's model id to firestore doc of the hunt.
 
     //Gotta make sure to set option when taking photo to be base64.
@@ -169,7 +170,8 @@ app.post("/addItemToHunt", async (req,res) => {
             itemsRef.doc(item.id).set({
 
                 id: item.id,
-                name: item.name
+                name: item.name,
+                thumbnail:thumbnailIndex
 
             });
                 
