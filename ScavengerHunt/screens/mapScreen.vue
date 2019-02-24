@@ -1,10 +1,19 @@
 <template>
-    
+    <view>
+        <view>
+            
+        </view>
+    </view>
 </template>
 
 <script>
 export default {
-    name: 'MapScreen'
+    name: 'MapScreen',
+    props:{
+        navigation:{
+            type: Object
+        }
+    }
 }
 </script>
 

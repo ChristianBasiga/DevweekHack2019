@@ -1,5 +1,9 @@
 <template>
-  <app-navigation></app-navigation>
+  <app-navigation>
+
+
+    
+  </app-navigation>
 </template>
  
 <script>
@@ -15,7 +19,6 @@ const AppNavigation = StackNavigator(
   },
   {
     initialrouteName: 'Home'
-
   }
 );
 
