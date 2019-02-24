@@ -44,7 +44,9 @@ export default {
         },
         createHunt(){
             
-            this.navigation.navigate("Camera");
+            this.navigation.navigate("Camera", {
+                isParticipant: false
+            });
         }
     }
 

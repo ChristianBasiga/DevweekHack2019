@@ -21,6 +21,9 @@ export default {
     props:{
         isParticipant: {
             type: Boolean
+        },
+        navigation: {
+            type: Object
         }
     },
     data: function(){
@@ -48,9 +51,12 @@ export default {
                 this.$refs.camera.takePictureAsync(options)
                     .then(result => {
                         console.log(result);
+                        const {params} = this.navigation.state; // Sets params to object passed through navigation
+                        this.isParticipant = params.isParticipant;
+                        console.log(this.isParticipant);
                         
-                        if(isParticipant){
-                            
+                        if(this.isParticipant){
+                            this.picturesTaken = result; 
                         }
                         else{ //Creator.
                             this.picturesTaken = this.picturesTaken.concat(result);
@@ -58,17 +64,8 @@ export default {
                     })
                     .catch((err)=>{
                         console.log(err);
-                    })
+                    });
                 
-                /*
-                this.$refs.camera.
-
-                .then( picture => {
-
-
-                } )
-                .err()
-                */
         }
     },
     components:{
