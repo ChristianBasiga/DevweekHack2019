@@ -7,6 +7,8 @@ const apiKey = process.env.TOMTOM_API_KEY;
 const clarifai = require('./clarifai');
 const baseURL = "https://api.tomtom.com/geofencing/1";
 
+//In meters
+const radiusToCheck = '100';
 const keyParams = {
     
     api: "key="+apiKey,
@@ -39,6 +41,7 @@ app.post("/createHunt", (req,res) => {
 
                 //Also need the clarify here, creating different scripts almost irrelvant now.
 
+
                 scavCollection.doc(project.data.id).set({
                     items:["concept"]
                 })
@@ -51,6 +54,7 @@ app.post("/createHunt", (req,res) => {
                             model => {
 
                                 //Only send if all parts were created correctly.
+                                //
                                 res.send({project:project.data});
 
                             }
@@ -79,11 +83,23 @@ app.get("/joinHunt", async (req,res) => {
 
 
     //For items.
-    const huntCollection = firestore.collection("ScavengerHunts").doc(projectId);
+    const huntCollection = firestore.collection("ScavengerHunts").doc(projectId).collection("Items");
 
     try{
-        const huntItemList = await huntCollection.get();
+        //Returns the doc ref, then get data fo that ref.
+        const huntItemsRef = await huntCollection.get();
 
+        const huntItemList = [];
+
+        //Pushes all items from collection into array.
+        huntItemsRef.docs.forEach(docSnapshot => {
+
+            if (docSnapshot.exists){
+
+                huntItemList.push(docSnapshot.data());
+            }
+
+        })
         //Next fetch fences for project.
 
         const url = baseURL + "/projects/"+projectid+"?" + keyParams.api;
@@ -142,14 +158,23 @@ app.post("/registerUser", (req, res) => {
 });
 
 
+app.get("/checkObjectFencing", (req,res) => {
 
 
+    
+    const {objectId, objectLocation, huntId} = req.params;
+    const {longitude, latitude, altitude} = objectLocation;
+    const point = longitude + "," + latitude + "," + altitude;
+
+    axios.get(baseURL + "/report/"+huntId+"?key=" + process.env.TOMTOM_API_KEY + "&point="+point + "&object=" + objectId + "&range="+radiusToCheck)
+        .then (response => {
+
+            res.send(response.inside.features);
+        })
+        .catch(err => {
+
+            console.log("Failed to check if object in a fence", err);
+        })
 
 
-
-//Report request post.
-
-
-//Get Fences in vicinity 
-
-
+})
