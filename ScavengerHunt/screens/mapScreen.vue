@@ -22,9 +22,13 @@
         <!-- Could be visually made better, but that's not the point-->
 
         <view class = "uiContainer">
+        
         <circle-form v-if="editing" :submit = "createFence" :close="closeEditor" :coords="selectedLocation"/>
+        
         <button class = "button" v-if="!editing" :on-press="openEditor" :title ="'Edit Fences'"/>
+
         <button class = "submitButton" v-if="fences.length > 0" :on-press = "createFences" :title="'Submit Fences'"/>
+        <button class = "cameraButton" title=":Camera" :on-press="goToCamera"/>
         </view>
     </view>
 </template>
@@ -97,6 +101,14 @@ export default {
     methods:{
 
 
+        goToCamera(){
+
+            //Camera will check if null.
+            this.navigation.navigate("Camera", {
+
+                    selectedHunt: selectedHunt
+            });
+        },
         openEditor(){
 
             
@@ -221,6 +233,7 @@ export default {
 .uiContainer{
 
     position: absolute;
+    display:grid;
 }
 
 .button{
@@ -229,7 +242,8 @@ export default {
 }
 .submitButton{
     position: absolute;
-    bottom:0;
+    align-self: end;
+    justify-self:end;
 }
 
 </style>

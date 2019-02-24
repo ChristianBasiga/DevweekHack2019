@@ -53,7 +53,7 @@ export default {
         createHunt(){
             this.navigation.navigate("Camera", {
                 isParticipant: false,
-                selectedHunt: this.selectedHunt
+            //    selectedHunt: this.selectedHunt
             });
         },
         selectHunt(hunt){

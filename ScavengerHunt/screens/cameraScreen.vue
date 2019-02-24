@@ -58,6 +58,8 @@ export default {
             });
     },
     created(){
+
+        
         
     },
     methods:{
@@ -79,6 +81,8 @@ export default {
                 items: this.selectedHunt.items
             })
             .then(res => {
+
+                //Tells if it matched.
                 this.matchedLabel = res;
             })
             .catch((err)=>{
