@@ -15,8 +15,6 @@ const keyParams = {
     admin: "adminKey="+adminKey,
 };
 
-
-
 //Todo later, delete hunt.
 
 //Creates hunt on firestore, project on tomtom, and model in clarifai.
@@ -37,6 +35,9 @@ app.post("/createHunt", async (req,res) => {
     
        
 
+        console.log("project ", project.data);
+        res.send(project.data);
+    
     console.log("project id", project.data.id);
 
     const firestore = firebase.firestore();           
@@ -44,7 +45,8 @@ app.post("/createHunt", async (req,res) => {
 
                 //Also need the clarify here, creating different scripts almost irrelvant now.
 
-    await scavCollection.doc(project.data.id).set({               
+    await scavCollection.doc(project.data.id).set({       
+         id: project.data.id,        
          name: huntName
     })
                     
@@ -55,10 +57,10 @@ app.post("/createHunt", async (req,res) => {
                       
     console.log("model", model);
 
-    res.send(project.data);
     }
     catch(error) {
         console.log("error",error);
+        res.send("error");
     }
 
 });

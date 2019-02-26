@@ -21,8 +21,10 @@ expressApp.get("/getAllHunts", (req, res) => {
 
     //Gets collection of hunts, then it's items.
 
+    console.log("I am called");
     const firestore = firebase.firestore();
     const huntCollection = firestore.collection("ScavengerHunts");
+    var hunts = [];
 
     huntCollection.get()
         .then(collectionSnapshot => {
@@ -31,7 +33,6 @@ expressApp.get("/getAllHunts", (req, res) => {
 //Should this also be an object in TomTom? Maybe would need to make sure the picture they took is actually within that
             collectionSnapshot.docs.forEach(async doc => {
 
-                var hunts = [];
                 if (doc.exists){
 
 
@@ -40,7 +41,7 @@ expressApp.get("/getAllHunts", (req, res) => {
                     const generalHuntInfo = doc.data();
 
                     //Then get all items of each respective doc.
-                    const itemsRef = doc.collection("Items");
+                    const itemsRef = doc.ref.collection("Items");
 
                     const itemsSnapshot = await itemsRef.get()
 
@@ -58,22 +59,28 @@ expressApp.get("/getAllHunts", (req, res) => {
                                 }
 
                     });
+
+
+                    const hunt = {
+                        summary: generalHuntInfo,
+                        items:items
+                    };
+    
+                    hunts.push(hunt);
                 }
+                
 
-                const hunt = {
-                    summary: generalHuntInfo,
-                    items:items
-                };
-
-                hunts.push(hunt);
+             
             });
 
+            //I get to here.
             res.send({hunts:hunts});
 
         })
         .catch(err => {
 
             console.log("Failed to fetch all scavenger hunts", err);
+            res.send({err});
         })
 
 });
