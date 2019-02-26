@@ -2,8 +2,11 @@
 
 <template>
 
-    <text v-model="name"> Name </text>
-
+    <view>
+    <text > Name </text>
+    <text-input v-model="name" :style="{height: 40, borderColor: 'gray', borderWidth: 1}"/>
+    <button :on-press="createHunt" :title="'Create Hunt'"/>
+    </view>
 
 </template>
 
@@ -15,7 +18,7 @@
     import axios from 'axios';
 
 
-    const url = "localhost:8080";
+    const url = "https://scavengerhuntbackend.herokuapp.com";
     export default{
 
         props:{
@@ -39,18 +42,22 @@
 
 
                 try{
-                    const hunt = await axios.post("/createHunt", {
-                        name: this.name,
+
+                    console.log("this.name", this.name);
+                    const hunt = await axios.post(url+"/createHunt", {
+                        huntName: this.name,
                     });
 
-                    this.navigation.navigate("editHunt",{
+                    alert((hunt.data.id));
 
-                        hunt:this.hunt
+                    this.navigation.navigate("EditHunt",{
+
+                        hunt:hunt.data.id
                     });
                 }
                 catch(err){
 
-                    console.log("error");
+                    console.log("error", err);
                 }
             }
         }

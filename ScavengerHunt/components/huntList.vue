@@ -1,20 +1,37 @@
 <template>
     <view >
-        <view v-bind:key="hunt.id" v-for="hunt in hunts">
-            <Hunt v-bind:hunt="hunt" v-on:hunt-selected="$emit('hunt-selected',hunt)" />
+        <view>
+            <button  v-for="hunt in hunts" :key = "hunt.id" class="huntButton"
+            :title="hunt.name"
+            :on-press="() => {joinHunt(hunt)}"/>
         </view>
     </view>
 </template>
 
 <script>
-import Hunt from "./hunt.vue";
 
 export default {
 
     name: 'HuntList',
-    props: ["hunts"],
-    components:{
-        Hunt
+    props: {
+        
+        hunts:{
+            type: Array
+        },
+        goToHunt:{
+            type : Function
+        }
+        
+
+    },
+
+    methods:{
+
+        joinHunt(hunt){
+            
+
+                this.goToHunt(hunt);
+        }
     }
 }
 </script>

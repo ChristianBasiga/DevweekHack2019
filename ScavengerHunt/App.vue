@@ -6,14 +6,16 @@
 <script>
 import { StackNavigator } from "vue-native-router";
 import HomeScreen from "./screens/homeScreen.vue";
-import CameraScreen from "./screens/cameraScreen.vue";
-import MapScreen from "./screens/mapScreen.vue";
+import CreateHuntScreen from './screens/createHunt.vue';
+import HuntScreen from './screens/hunt.vue';
+import EditHuntScreen from './screens/editHunt.vue';
 
 const AppNavigation = StackNavigator(
   {
-    Map: MapScreen,
     Home: HomeScreen,
-    Camera: CameraScreen,
+    CreateHunt: CreateHuntScreen,
+    JoinHunt: HuntScreen,
+    EditHunt: EditHuntScreen
   },
   {
     initialrouteName: 'Home'

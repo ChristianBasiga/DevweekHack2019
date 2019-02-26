@@ -5,7 +5,11 @@
 <script>
 export default {
     name: 'HuntItem',
-    props: ["huntitem"]
+    props: {
+        huntItem:{
+            type: Object
+        }
+    },
 }
 </script>
 

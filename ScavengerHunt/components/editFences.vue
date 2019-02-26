@@ -27,8 +27,9 @@
         
         <button class = "button" v-if="!editing" :on-press="openEditor" :title ="'Edit Fences'"/>
 
-        <button class = "submitButton" v-if="fences.length > 0" :on-press = "createFences" :title="'Submit Fences'"/>
-        <button class = "cameraButton" title=":Camera" :on-press="goToCamera"/>
+        <button class = "submitButton" v-if="fences.length > 0" :on-press = "createFences" :title="'Update Fences'"/>
+        <button class = "closeButton" :title = "'Cancel'" :on-press = "cancel"/>
+
         </view>
     </view>
 </template>
@@ -48,7 +49,7 @@ const longitudeDelta = 0.0922;
 const latitudeDelta = longitudeDelta *  aspectRatio;
 let id = 0;
 var EditEnum =  Object.freeze({"Corridor": 0, "Circle": 1, "Square":1 })
-const backendUrl = "http://localhost:8080";
+const backendUrl = "https://scavengerhuntbackend.herokuapp.com";
 export default {
     name: 'MapScreen',
     data(){
@@ -84,7 +85,6 @@ export default {
     
     beforeDestroy(){
 
-        console.log("I happen");
         subscription();
     },
     
@@ -95,20 +95,14 @@ export default {
         },
         selectedHunt:{
             type: Object
+        },
+        close:{
+            type:Function
         }
     },
 
     methods:{
 
-
-        goToCamera(){
-
-            //Camera will check if null.
-            this.navigation.navigate("Camera", {
-
-                    selectedHunt: selectedHunt
-            });
-        },
         openEditor(){
 
             
@@ -117,6 +111,13 @@ export default {
         onChangeDrawMode(newMode){
 
             this.drawing = EditEnum[newMode];
+        },
+
+        cancel(){
+
+            
+            this.close();
+            
         },
 
         scan(){

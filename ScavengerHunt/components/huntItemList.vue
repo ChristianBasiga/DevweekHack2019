@@ -1,8 +1,6 @@
 <template>
     <view>
-        <view v-bind:key="huntitem.id" v-for="huntitem in huntitems">
-            <HuntItem v-bind:huntitem="huntitem"/>
-        </view>
+        <HuntItem  v-for="huntItem in huntitems" :key = "huntItem.id"/>
     </view>
 </template>
 
@@ -11,7 +9,14 @@ import HuntItem from "./huntItem.vue"
 
 export default {
     name: 'HuntItemList',
-    props: ["huntitems"],
+    
+    props: {
+
+        huntItems:{
+            type: Array
+        }
+    },
+
     components:{
         HuntItem
     }

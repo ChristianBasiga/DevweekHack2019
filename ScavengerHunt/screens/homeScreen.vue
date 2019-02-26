@@ -1,11 +1,9 @@
 <template>
     <view>     
-        <HuntList v-bind:hunts="hunts" v-on:hunt-selected="selectHunt"/>
         <view>
-            <button 
-                :on-press="joinHunt"
-                title="Join Hunt"    
-            />
+            
+            <HuntList :goToHunt= "goToHunt" :hunts = "hunts" />
+           
 
             <button
                 :on-press="createHunt"
@@ -37,27 +35,24 @@ export default {
     },
     created(){
         // Get list of hunts
-        axios.get('localhost:8080/getAllHunts')
-        .then(res => this.hunts = res)
+        axios.get('https://scavengerhuntbackend.herokuapp.com/getAllHunts')
+        .then(res => {
+            
+            console.log(res);
+            this.hunts = res
+        })
         .catch(err => console.log(err));
-
-        alert("hello");
-        console.log(this.navigation);
-        
     },
     methods: {
-        joinHunt(){
-            this.navigation.navigate("Map", {
-                    selectedHunt: this.selectedHunt});
-        },
-        createHunt(){
-            this.navigation.navigate("Camera", {
-                isParticipant: false,
-            //    selectedHunt: this.selectedHunt
+      
+        goToHunt(hunt){
+
+            this.navigation.navigate("JoinHunt", {
+                hunt:hunt
             });
         },
-        selectHunt(hunt){
-            this.selectedHunt = hunt;
+        createHunt(){
+            this.navigation.navigate("CreateHunt");
         }
     }
 

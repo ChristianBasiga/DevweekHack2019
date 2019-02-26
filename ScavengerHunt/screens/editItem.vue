@@ -5,11 +5,11 @@
                 <button
                     class = "takePictureButton"
                     :on-press="takePicture"
-                    title="Take Picture"
+                    :title="'Take Picture'"
                 />
                 <button
                     :on-press="toggleParticipant"
-                    title="Participant Toggle"
+                    :title="'Participant Toggle'"
                 />
             </view>
         </camera>
@@ -23,12 +23,19 @@ import {Alert} from 'react-native';
 import axios from 'axios';
 import uuid from "uuid/v4";
 
+
+const url = "https://scavengerhuntbackend.herokuapp.com";
 export default {
+    
     name: 'CameraScreen',
     props:{
         navigation: {
             type: Object
         },
+        hunt:{
+
+            type: Object
+        }
     },
     data: function(){
         return{
@@ -79,7 +86,8 @@ export default {
                 name: this.itemName,
                 thumbnail: null
             }
-            axios.post("localhost:8080/addItemToHunt", {
+            axios.post(url+"/addItemToHunt", {
+
                 huntId: this.hunt.id,
                 photosOfItem: this.picturesTaken,
                 item: this.newItem,
