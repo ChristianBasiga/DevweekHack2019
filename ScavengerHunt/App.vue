@@ -9,13 +9,14 @@ import HomeScreen from "./screens/homeScreen.vue";
 import CreateHuntScreen from './screens/createHunt.vue';
 import HuntScreen from './screens/hunt.vue';
 import EditHuntScreen from './screens/editHunt.vue';
-
+import EditItemScreen from './screens/editItem.vue';
 const AppNavigation = StackNavigator(
   {
     Home: HomeScreen,
     CreateHunt: CreateHuntScreen,
     JoinHunt: HuntScreen,
-    EditHunt: EditHuntScreen
+    EditHunt: EditHuntScreen,
+    EditItem: EditItemScreen
   },
   {
     initialrouteName: 'Home'

@@ -17,8 +17,10 @@
 
     import axios from 'axios';
 
+    import urls from '../sitedata/urls.js';
+    const url = urls.backendURL;
 
-    const url = "https://scavengerhuntbackend.herokuapp.com";
+
     export default{
 
         props:{

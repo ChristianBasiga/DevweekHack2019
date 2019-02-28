@@ -1,19 +1,27 @@
 <template>
-    <view>
-        <camera ref="camera">
-            <view :style = "{width:wp,height:hp, position:'relative'}" >
-                <button
-                    class = "takePictureButton"
+        <camera ref="camera" class = "camera" :style = "{width:wp,height:hp}">
+
+            
+            <!--<view class="cameraUI" :style = "{width:wp,height:hp}">-->
+
+                <!-- To add later, going back and forth between pictures and deleting-->
+                <text :style = "{paddingBottom:10}"> Pictures Taken {{picturesTaken.length + "/" + picturesToTake }} </text>
+                <text> Item Name </text>
+                <text-input placeholder = "Enter name of your item"
+                :style = "{height: 40, borderColor:'gray', borderWidth:1,backgroundColor:'rgb(255,255,255)'}" v-model="itemName"/>
+                
+                <touchable-opacity
                     :on-press="takePicture"
-                    :title="'Take Picture'"
-                />
-                <button
-                    :on-press="toggleParticipant"
-                    :title="'Participant Toggle'"
-                />
-            </view>
+                >
+
+                    <image class="takePicture"
+                        :source = "require('../assets/camera.png')"
+                        :style = "{width:buttonWidth, height:buttonHeight, marginTop:50}"/>
+                </touchable-opacity>
+
+           <!-- </view>-->
+            
         </camera>
-    </view>
 </template>
 
 <script>
@@ -23,8 +31,13 @@ import {Alert} from 'react-native';
 import axios from 'axios';
 import uuid from "uuid/v4";
 
+import urls from '../sitedata/urls.js';
+const url = urls.backendURL;
 
-const url = "https://scavengerhuntbackend.herokuapp.com";
+
+
+//Need to test this, and make sure works, fix layout as well.
+
 export default {
     
     name: 'CameraScreen',
@@ -42,14 +55,19 @@ export default {
             hasCameraPermission: false,
             type: Camera.Constants.Type.back,
             wp:wp('100%'),
-            hp:hp('100%'),
+            hp:hp('90%'),
+            fieldWidth:wp('30%'),
+            buttonWidth:wp('30%'),
+            buttonHeight:hp('30%'),
             picturesTaken: [],
+            picturesToTake:5,
             thumbNailIndex: 0,
-            newItem = null,
-            itemName = ""
+            newItem :null,
+            itemName: ""
         }
     },
     mounted: function(){
+
         Permissions.askAsync(Permissions.CAMERA)
             .then(status => {
                 hasCameraPermission = status.status == "granted" ? true : false;
@@ -68,17 +86,18 @@ export default {
             }
             this.$refs.camera.takePictureAsync(options)
                 .then(result => {
-                    console.log(result);
+
                     const {params} = this.navigation.state; // Sets params to object passed through navigation  
                     this.picturesTaken = this.picturesTaken.concat(result); 
+                     if(this.picturesTaken.length == 5){
+                        this.chooseThumbnail();
+                        this.addItem();
+                    }
                 })
                 .catch((err)=>{
                     console.log(err);
                 });
-            if(this.picturesTaken.length == 5){
-                chooseThumbnail();
-                addItem();
-            }
+           
         },
         addItem(){
             this.newItem = {
@@ -96,6 +115,8 @@ export default {
             .catch(err => console.log(err))
         },
         chooseThumbnail(){
+
+            console.log("I happen?");
             Alert.alert(
                 "Choose Thumbnail",
                 "Pick 1-5",
@@ -117,8 +138,16 @@ export default {
 }
 </script>
 
-<style>
-    .takePictureButton{
-        margin-top:50px;
-    }
+<style scoped>
+   
+
+   .camera{
+
+
+       flex: 1;
+       justify-content: center;
+       align-items: center;
+   }
+
+    
 </style>

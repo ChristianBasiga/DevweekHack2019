@@ -9,18 +9,18 @@
         :coordinate = "{latitude: region.latitude, longitude: region.longitude}"/>
 
 
-        <circle v-for="fence in loadedFences" :key="fence.id" :center="{latitude:fence.coordinates.latitude, 
-        longitude: fence.coordinates.longitude}"
+        <circle v-for="fence in loadedFences" :key="fence.id" :center="{latitude:fence.coordinates[1], 
+        longitude: fence.coordinates[0]}"
          :radius="fence.size"/>
 
-        <circle v-for="fence in fences" :key="fence.id" :center="{latitude:fence.coordinates.latitude, 
-        longitude: fence.coordinates.longitude}"
+        <circle v-for="fence in fences" :key="fence.id" :center="{latitude:fence.coordinates[1], 
+        longitude: fence.coordinates[0]}"
          :radius="fence.size"/>
 
 
         </map-view>
         <!-- Could be visually made better, but that's not the point-->
-
+xx
         <view class = "uiContainer">
         
         <circle-form v-if="editing" :submit = "createFence" :close="closeEditor" :coords="selectedLocation"/>
@@ -40,6 +40,10 @@ import {MapView, Location, Permissions} from 'expo';
 import CircleForm from '../components/circleForm.vue';
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import axios from 'axios';
+
+import urls from '../sitedata/urls.js';
+const url = urls.backendURL;
+
 const {Marker, Square, Circle}  = MapView;
 var subscription = null;
  const width = wp('100%');
@@ -49,14 +53,14 @@ const longitudeDelta = 0.0922;
 const latitudeDelta = longitudeDelta *  aspectRatio;
 let id = 0;
 var EditEnum =  Object.freeze({"Corridor": 0, "Circle": 1, "Square":1 })
-const backendUrl = "https://scavengerhuntbackend.herokuapp.com";
 export default {
     name: 'MapScreen',
     data(){
 
        
 
-        const loadedFences = [];//this.selectedHunt.fences;
+        console.log(JSON.stringify(this.selectedHunt));
+        const loadedFences = this.selectedHunt.fences != null? [...this.selectedHunt.fences] : [];
 
         return {
             //current location.
@@ -69,23 +73,20 @@ export default {
             width:width,
             height:height,
             selectedLocation:null,
-            loadedFences
-
-
-           
+            loadedFences:loadedFences
         };
     },
 
     mounted(){
 
         this.listenToLocation();
-
+        this.loadFences();
         //Also need to take in from prop, current fences to display.
     },
     
     beforeDestroy(){
 
-        subscription();
+        subscription.remove();
     },
     
 
@@ -102,6 +103,13 @@ export default {
     },
 
     methods:{
+
+
+        loadFences(){
+
+
+            axios.get("")
+        }
 
         openEditor(){
 
@@ -124,7 +132,7 @@ export default {
 
             //Sends report request to server.
 
-            axios.get(backendUrl+"/")
+                axios.get(url+"/")
         },
 
 
@@ -151,14 +159,18 @@ export default {
             const fences = this.fences;
 
             //Ideally I batch all of these, and send. Don't think I have that yet.
+            console.log("selected Hunt id " , this.selectedHunt.id);
+            console.log("fences", JSON.stringify(fences));
 
-            axios.post(backendUrl+"/addFences",{
+
+
+            axios.post(url+"/createFences",{
                 huntId:this.selectedHunt.id,
                 fences
             })
             .then( response => {
 
-                console.log("response", response);
+                console.log("response", JSON.stringify(response));
             })
             .catch(err => {
 
@@ -172,7 +184,9 @@ export default {
 
 
             const coords = e.nativeEvent.coordinate;
-            this.selectedLocation = coords;
+
+            //Should change in baackend not here actually.
+            this.selectedLocation = [coords.longitude, coords.latitude];
         },
 
         closeEditor(){
@@ -197,13 +211,14 @@ export default {
                 
                 subscription = await Location.watchPositionAsync({}, (location) => {
 
-                        console.log("location change from watch", location);
+                        //Test this while walking long distances.
+                        console.log("location change from watch", location.coords.latitude);
                         const {coords} = location;
 
                         this.region = {
 
-                            latitude: coords.latitude,
-                            longitude: coords.longitude,
+                            latitude: location.coords.latitude,
+                            longitude: location.coords.longitude,
                             longitudeDelta: longitudeDelta,
                             latitudeDelta: latitudeDelta
                         };
@@ -234,17 +249,16 @@ export default {
 .uiContainer{
 
     position: absolute;
-    display:grid;
+    display:flex;
+    align-content: center;
+    justify-content: center;
 }
 
 .button{
 
-    position: absolute;
 }
 .submitButton{
-    position: absolute;
-    align-self: end;
-    justify-self:end;
+   
 }
 
 </style>

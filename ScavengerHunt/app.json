@@ -27,6 +27,7 @@
     },
     "packagerOpts": {
       "config": "rn-cli.config.js"
-    }
+    },
+    "description": ""
   }
 }

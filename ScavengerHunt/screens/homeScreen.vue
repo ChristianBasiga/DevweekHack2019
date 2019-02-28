@@ -1,21 +1,27 @@
 <template>
     <view>     
-        <view>
             
-            <HuntList :goToHunt= "goToHunt" :hunts = "hunts" />
+            <HuntList :join= "joinHunt" :edit = "editHunt" :hunts = "hunts" />
            
 
             <button
                 :on-press="createHunt"
-                title="Create Hunt"
+                :title="'Create Hunt'"
             />
-        </view>
+
+
+            
     </view>
 </template>
 
 <script>
 import HuntList from "../components/huntList.vue";
 import axios from "axios";
+import urls from '../sitedata/urls.js';
+const url = urls.backendURL;
+console.log("url ", url);
+
+const {CreateHunt, EditHunt, JoinHunt} = urls.routes;
 
 export default {
     name: 'HomeScreen',
@@ -33,21 +39,33 @@ export default {
             selectedHunt: null
         }
     },
-    created(){
+    mounted(){
         // Get list of hunts
-        axios.get('https://scavengerhuntbackend.herokuapp.com/getAllHunts')
-        .then(res => {
-            
-            console.log(res);
-            this.hunts = res
-        })
-        .catch(err => console.log(err));
+        
+            //Post man fetches this fine.   
+            axios.get(url+"/getAllHunts")
+            .then(res => {
+
+                //Always within data, GOTTA REMEMBER THIS FOR AXIOS REQUESTS.
+                //alSO for checing objects don't forget to stringify, wasted so much time.
+             //   alert(JSON.stringify(res));
+                //console.log(res);
+                this.hunts = res.data;
+            })
+            .catch(err => console.log(err));
     },
     methods: {
       
-        goToHunt(hunt){
+
+        joinHunt(hunt){     
 
             this.navigation.navigate("JoinHunt", {
+                hunt:hunt
+            });
+        },
+        editHunt(hunt){
+
+            this.navigation.navigate("EditHunt",{
                 hunt:hunt
             });
         },
