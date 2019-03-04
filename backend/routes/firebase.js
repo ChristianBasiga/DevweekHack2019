@@ -16,72 +16,111 @@ var config = {
 
 const firebase = Firebase.initializeApp(config);
 
+expressApp.get("/getFencesOfHunt", (req,res) => {
 
-expressApp.get("/getAllHunts", (req, res) => {
+    const {huntId} = req.params;
 
-    //Gets collection of hunts, then it's items.
 
-    console.log("I am called");
     const firestore = firebase.firestore();
-    const huntCollection = firestore.collection("ScavengerHunts");
-    var hunts = [];
-
-    huntCollection.get()
-        .then(collectionSnapshot => {
 
 
-//Should this also be an object in TomTom? Maybe would need to make sure the picture they took is actually within that
-            collectionSnapshot.docs.forEach(async doc => {
+    const fenceCollection = firestore.collection("ScavengerHunts").doc(huntId).collection("Fences");
 
-                if (doc.exists){
+    fenceCollection.get()
+        .then (fencesSnapshot => {
 
+            const fences = [];
+            if (fencesSnapshot.exists){
 
-                    //Stuff like general location of hunt or locations/
-                    //hunt takes place.
-                    const generalHuntInfo = doc.data();
+                fencesSnapshot.docs.forEach( docSnapshot => {
 
-                    //Then get all items of each respective doc.
-                    const itemsRef = doc.ref.collection("Items");
+                    if (docSnapshot.exists){
 
-                    const itemsSnapshot = await itemsRef.get()
+                        fences.push(docSnapshot.data());
+                    }
+                })
 
-                    var items = [];
-                    itemsSnapshot.docs.forEach(itemDoc => {
+                res.send(fences);
+            }
+            else{
 
-                                if (itemDoc.exists){
+                res.send({error:"Cannot load fences for Hunt"});
+            }
+        })
+        .catch(err => {
 
+            console.log(err);
+        })
 
-                                    const item = itemDoc.data();
-                                    //Should have both itemid and item name.
-                                    //Then for displaying photo as 
-                                    console.log("item",item);
-                                    items.push(item);
-                                }
+});
 
-                    });
+expressApp.get("/getItemsOfHunt", (req,res) => {
 
+    const {huntId} = req.params
+    const firestore = firebase.firestore();
 
-                    const hunt = {
-                        summary: generalHuntInfo,
-                        items:items
-                    };
-    
-                    hunts.push(hunt);
+    const itemCollection = firestore.collection("ScavengerHunts").doc(huntId).collection("Items");
+
+     itemCollection.get()
+        .then (itemsSnapshot => {
+
+            if (!itemsSnapshot.exists){
+                 res.send({isEmpty:true});
+                 return true;
+            }
+            const items = [];
+            itemsSnapshot.forEach(docSnapshot => {
+
+                if (docSnapshot.exists){
+
+                    const item = docSnapshot.data();
+                    items.push(item);
                 }
-                
-
-             
             });
 
-            //I get to here.
-            res.send({hunts:hunts});
+            res.send(items);
 
         })
         .catch(err => {
 
-            console.log("Failed to fetch all scavenger hunts", err);
-            res.send({err});
+            console.log("Failed to fetch items for " + huntId, err);
         })
+
+
+
+
+});
+
+expressApp.get("/getAllHunts", async (req, res) => {
+
+    //Gets collection of hunts, then it's items.
+
+    const firestore = firebase.firestore();
+    const huntCollection = firestore.collection("ScavengerHunts");
+
+    //Maybe pull all items later? since got id anyway.
+    var hunts = [];
+
+    const collectionSnapshot = await huntCollection.get();
+        
+
+
+    collectionSnapshot.docs.forEach( doc => {
+                    //Stuff like general location of hunt or locations/
+                    //hunt takes place.
+        const generalHuntInfo = doc.data();
+        hunts.push(generalHuntInfo);
+                    //Then get all items of each respective doc.
+                   
+    });
+                
+
+             
+            
+
+            //I get to here.
+    res.send(hunts);
+       
 
 });
 

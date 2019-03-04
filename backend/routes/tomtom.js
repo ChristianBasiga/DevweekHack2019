@@ -46,7 +46,6 @@ app.post("/createHunt", async (req,res) => {
                 //Also need the clarify here, creating different scripts almost irrelvant now.
 
     await scavCollection.doc(project.data.id).set({       
-         id: project.data.id,        
          name: huntName
     })
                     
