@@ -2,11 +2,9 @@ import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {Text, Image, TouchableOpacity} from 'react-native';
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 
-const locationImage;
-const captureImage;
-const editImage;
 //Essentially the Item as it displays as an element in list.
 //and the alternate view of previwing the picture.
 
@@ -29,7 +27,7 @@ export default class ItemView extends Component{
                <Text style = {styles.name}> {name} </Text>
 
                {this.props.onEditClicked && <TouchableOpacity onPress = {this.props.onEditClicked}>
-                    <Image source = {{uri: editImage}} />
+                    <Icon name = "create"/>
                 </TouchableOpacity>}
 
             </View>
@@ -38,10 +36,10 @@ export default class ItemView extends Component{
             
             <View style = {styles.links}>
                 <TouchableOpacity style = {styles.link} onPress = {this.props.onCaptureClicked}>
-                    <Image source = {captureImage} />
+                    <Icon name = "camera" />
                 </TouchableOpacity>
                 <TouchableOpacity style = {styles.link} onPress = {this.props.onFindItemClicked}>
-                    <Image source = {locationImage} />
+                    <Icon name = "navigate"/>
                 </TouchableOpacity>
             </View>
         
