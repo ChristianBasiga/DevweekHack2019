@@ -1,10 +1,11 @@
 
 import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 import Camera from 'react-native-camera';
 
 
 
-class CaptureItem extends Component{
+export default class CaptureItem extends Component{
 
     constructor(props){
 
@@ -48,6 +49,13 @@ class CaptureItem extends Component{
     }
 
 }
+
+CaptureItem.propTypes = {
+
+    onCapture : PropTypes.func.isRequired,
+    overlay : PropTypes.element.isRequired
+}
+
 const styles = StyleSheet.create({
 
     container: {
@@ -55,11 +63,11 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         backgroundColor: 'black',
       },
-      preview: {
-        flex: 1,
+    preview: {
+        flex: 1,        
         justifyContent: 'flex-end',
         alignItems: 'center',
-      },
+    },
 
     capture: {
         flex: 0,
@@ -71,4 +79,3 @@ const styles = StyleSheet.create({
         margin: 20,
       },
 });
-export default CaptureItem;
