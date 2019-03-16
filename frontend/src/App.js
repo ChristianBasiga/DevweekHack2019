@@ -1,8 +1,8 @@
 
 import React, {Component} from 'react';
 import  {createAppContainer, createBottomTabNavigator } from 'react-navigation';
-import EditNavigator from './screens/edithunt/Navigation';
-import JoinNavigator from './screens/joinhunt/Navigation';
+import EditNavigator from './screens/editinghunts/Navigation';
+import JoinNavigator from './screens/joininghunts/Navigation';
 /*
 import {Platform, StyleSheet, Text, View} from 'react-native';
 
