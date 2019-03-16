@@ -1,1 +1,0 @@
-//Opens view of picture.
