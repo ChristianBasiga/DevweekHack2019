@@ -1,8 +1,8 @@
 
 import React, {Component} from 'react';
-import  {createAppContainer, createSwitchNavigator } from 'react-navigation';
-import EditHuntScreen from './screens/edithunt';
-import JoinHuntScreen from './screens/joinhunt';
+import  {createAppContainer, createBottomTabNavigator } from 'react-navigation';
+import EditNavigator from './screens/edithunt/Navigation';
+import JoinNavigator from './screens/joinhunt/Navigation';
 /*
 import {Platform, StyleSheet, Text, View} from 'react-native';
 
@@ -14,7 +14,6 @@ const instructions = Platform.select({
 });
 */
 
-import HomeScreen from './screens/home';
 
 export default class App extends Component{
 
@@ -41,15 +40,14 @@ export default class App extends Component{
 
 }
 
-const AppSwitchNavigator = createSwitchNavigator(
+const AppSwitchNavigator = createBottomTabNavigator(
   {
 
-    Home: {screen:HomeScreen},
-    Create: {screen: EditHuntScreen},
-    Join: {screen: JoinHuntScreen}
+    Create: {screen: EditNavigator},
+    Join: {screen: JoinNavigator},
   },
   {
-    initialRouteName: "Home"
+    initialRouteName: "Join"
   }
   );
 
