@@ -2,7 +2,7 @@ import  { createStackNavigator } from 'react-navigation';
 
 import HuntsList from './index';
 import EditItem from './edititem';
-import HuntScreen from '../HuntScreen';
+import HuntScreen from './EditHunt';
 
 
 const navigator = createStackNavigator(
