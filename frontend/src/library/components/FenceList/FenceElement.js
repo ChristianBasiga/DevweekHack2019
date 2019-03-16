@@ -31,7 +31,7 @@ export default class FenceElement extends PureComponent{
                     
                 
                 </Text>
-                <Button title = "View on Map" onPress = {() => {this.props.onViewMap(fence)}}/>
+                <Button title = "View on Map" onPress = {() => {this.props.onPress(fence);}}/>
 
 
             </View>
@@ -93,7 +93,7 @@ export default class FenceElement extends PureComponent{
 FenceElement.propTypes = {
 
     fence: PropTypes.object,
-    onViewMap: PropTypes.func,
+    onPress: PropTypes.func,
     onItemPress: PropTypes.func
 };
 
