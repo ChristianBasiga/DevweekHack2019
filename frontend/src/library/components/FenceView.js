@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
+import {StyleSheet} from 'react-native';
 import MapView, {Circle, Polyline} from 'react-native-maps';
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 
@@ -84,9 +85,10 @@ export default class FenceView extends Component{
                         case this.fenceShapes.Circle:
 
                             return <Circle
-                                center = {fence.center}
+                                center = {fence.coords}
                                 radius = {fence.radius}
                                 strokeColor = {this.fenceColor}
+                                
                             />
                         case this.fenceShapes.Rectangle:
 
@@ -104,7 +106,7 @@ export default class FenceView extends Component{
             {/*The ui over the map, ie: shapes to create fences, etc. */}
             <Overlay style = {styles.overlay}>
 
-                {this.props.overlay}
+                {this.props.renderOverlay()}
 
             </Overlay>
 
@@ -117,8 +119,14 @@ export default class FenceView extends Component{
 
 FenceView.propTypes = {
 
-    fences: PropTypes.array,
-    overlay: PropTypes.element.isRequired,
+    //These actually will be passed in through params instead unfortunately.
+    region: PropTypes.object,
+    fences: PropTypes.array.isRequired,
+    //Screens that use FenceView just need to do overlay themselves
+    //this forces the need, but I don't like passing in element, so pass in function that returns it
+    //Decorating keeps it flexible, but may not be aware that need to apply absolute positiong to do it.
+    //this enforces an interface if you want to overlay on top of fence view.
+    renderOverlay: PropTypes.func.isRequired,
 }
 
 const styles = StyleSheet.create({
@@ -127,8 +135,9 @@ const styles = StyleSheet.create({
         width: wp('100%'),
         height: hp('100%')
     },
+
+    //Could change this to decorator or a function that returns a component instead of passing the component.
     overlay:{
         position: 'absolute',
-        bottom: 50
     }
 });

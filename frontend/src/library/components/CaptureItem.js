@@ -1,6 +1,7 @@
 
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
+import {StyleSheet} from 'react-native';
 import Camera from 'react-native-camera';
 
 

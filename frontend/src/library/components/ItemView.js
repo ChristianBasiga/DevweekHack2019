@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {Text, Image, TouchableOpacity} from 'react-native';
+import {Text, Image, TouchableOpacity, StyleSheet} from 'react-native';
+
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import Icon from 'react-native-vector-icons/Ionicons';
 
@@ -26,6 +27,7 @@ export default class ItemView extends Component{
             <View style = {{flex:1, justifyContent:"space-between"}}>
                <Text style = {styles.name}> {name} </Text>
 
+                {/* */}
                {this.props.onEditClicked && <TouchableOpacity onPress = {this.props.onEditClicked}>
                     <Icon name = "create"/>
                 </TouchableOpacity>}

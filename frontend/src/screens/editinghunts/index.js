@@ -15,7 +15,7 @@ export default class EditHuntsScreen extends Component{
 
             hunts : [
 
-                {title:"hunt1", items: [ {name:"item"}]},
+                {title:"hunt1", items: [ {name:"item"}], fences: [{name:"fence"}]},
                 {title:"hunt2"}
 
             ],
@@ -23,9 +23,26 @@ export default class EditHuntsScreen extends Component{
 
         this.onEditHunt = this.onEditHunt.bind(this);
         this.onCreateHunt = this.onCreateHunt.bind(this);
+        this.updateHunt = this.updateHunt.bind(this);
 
     }
 
+    updateHunt(hunt){
+
+        this.setState(state => {
+
+            //Prob easier if made it a map, keyed by name, but this is fine.
+            const rest = state.hunts.filter(h => h.name !== hunt.name);
+
+            const huntsWithUpdate = rest.concat(hunt);
+
+            return {
+                hunts: huntsWithUpdate
+            };
+
+        })
+        
+    }
  
     onEditHunt(hunt){
 
@@ -34,6 +51,8 @@ export default class EditHuntsScreen extends Component{
         this.props.navigation.navigate("EditHunt", {
             hunt: hunt,
             owned:true,
+            updateHunt:this.updateHunt
+
         });
     }
 
@@ -43,7 +62,9 @@ export default class EditHuntsScreen extends Component{
         this.props.navigation.navigate("EditHunt", {
             hunt: null,
             owned:true,
-            new:true
+            new:true,
+            updateHunt:this.updateHunt
+
         });
         
     }

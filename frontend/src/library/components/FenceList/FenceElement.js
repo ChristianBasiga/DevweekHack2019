@@ -27,10 +27,7 @@ export default class FenceElement extends PureComponent{
 
                 <Text> {fence.name} </Text>
                 
-                <Text> {fence.generalLocation} 
-                    
-                
-                </Text>
+                <Text> {fence.generalLocation} </Text>
                 <Button title = "View on Map" onPress = {() => {this.props.onPress(fence);}}/>
 
 
@@ -57,16 +54,17 @@ export default class FenceElement extends PureComponent{
 
     renderFenceItem({item}){
         
+        //having bg image not important to prototpye, CMON.
         return <FenceItem selected = {item.key === this.state.backgroundItem.key} item = {item} onPress = {this.updateBGItem}/>
 
     }
     renderFenceItems(){
 
         const {items} = this.props.fence;
-        const data = [this.props.fence.thumbnal].concat([...items]);
+     //   const data = [this.props.fence.thumbnal].concat([...items]);
         return <FlatList
             style = {styles.footer}
-            data = {data}
+            data = {items}
             renderItem = {this.renderFenceItem}
             horizontal = {true}
         

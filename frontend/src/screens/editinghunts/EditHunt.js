@@ -1,39 +1,50 @@
 import React, {PureComponent} from 'react';
-import {View, Text, TextInput, FlatList, StyleSheet} from 'react-native';
+import {View, Text, TextInput, FlatList, StyleSheet, Button} from 'react-native';
 import {widthPercentageToDP as wp} from 'react-native-responsive-screen';
 import ItemGrid from '../../library/components/ItemGrid';
 import FenceList from '../../library/components/FenceList';
 
 export default class EditHuntScreen extends PureComponent{
 
-
-    
-
-    tabs = [
-
-        {key:"Hunt"},
-        {key:"Fences"},
-        {key:"Items"}
-    ];
-
-    tabCallbacks = {
-
-        [this.tabs[0].key]: this.renderGeneralTab,
-        [this.tabs[1].key]: this.renderFenceList,
-        [this.tabs[2].key]: this.renderItemGrid
-    };
-
     constructor(props){
 
         super(props);
 
+        this.tabs = [
+
+            {key:"Hunt"},
+            {key:"Fences"},
+            {key:"Items"}
+        ];
+        //Bind beforehan, otherwise mapped to callback object
+        //Stupid reordering mistake wasted lke 8 minuetes after solved problem.
+        this.renderGeneralTab = this.renderGeneralTab.bind(this);
+        this.renderFenceList = this.renderFenceList.bind(this);
+        this.renderItemGrid = this.renderItemGrid.bind(this);
+        
+        this.tabCallbacks = {
+    
+            [this.tabs[0].key]: this.renderGeneralTab,
+            [this.tabs[1].key]: this.renderFenceList,
+            [this.tabs[2].key]: this.renderItemGrid
+        };
+
+        const hunt = this.props.navigation.getParam("hunt");
+        //This still needs submit that returns these values to overwrite the hunt
+        //need to  keep key as well. In actual production will be uid
         this.state = {
 
-            name:"",
-            items:[],
-            fences:[],
-            currentTab:0
+            name: hunt.name,
+            items:hunt.items,
+            fences:hunt.fences,
+            currentTab:this.tabs[0].key
         };
+
+      
+    
+
+
+      
 
         this.onUpdateName = this.onUpdateName.bind(this);
         this.addItem = this.addItem.bind(this);
@@ -51,6 +62,18 @@ export default class EditHuntScreen extends PureComponent{
     }
 
 
+    saveChanges(){
+
+        const {name, items, fences } = this.state;
+        
+        const updatedHunt = {
+            name,
+            items,
+            fences
+        };
+
+        this.props.navigation.getParam("updateHunt")(updatedHunt);
+    }
 
     updateTab(tab){
 
@@ -151,14 +174,16 @@ export default class EditHuntScreen extends PureComponent{
 
         //Navigates to FenceViewScreen, which has Fence View.
 
-        this.props.navigation.navigate
 
     }
 
     renderGeneralTab(){
 
+
+        //Okay, so the 'this' objec
+        console.log(JSON.stringify(this.state));
         return <View>
-            <TextInput  style = {styles.nameField} onChangeText = {this.onUpdateName} />
+            <TextInput style = {styles.nameField} onChangeText = {this.onUpdateName} />
             <Text> {this.state.name} </Text>
  
 
@@ -172,7 +197,7 @@ export default class EditHuntScreen extends PureComponent{
 
     renderItemGrid(){
 
-        <ItemGrid items = {this.state.items} onPressItem = {this.onEditItem}/>
+        return <ItemGrid items = {this.state.items} onPressItem = {this.onEditItem}/>
 
     }
 
@@ -190,7 +215,7 @@ export default class EditHuntScreen extends PureComponent{
                let borderColor = item.key == this.state.currentTab? "black" : "gray"
 
                 //Check if update tab works.
-               return <Button style = {{borderColor: borderColor}} title= {item.key} onPress = {() => {this.updateTab(item);}}/> 
+               return <Button style = {{backgroundColor: borderColor}} title= {item.key} onPress = {() => {this.updateTab(item);}}/> 
             }}
         />
     }
@@ -201,8 +226,10 @@ export default class EditHuntScreen extends PureComponent{
 
 
         return <View>
-                {renderTabs()}
-                {this.tabCallbacks[this.state.currentTab]()}           
+                {this.renderTabs()}
+                {this.tabCallbacks[this.state.currentTab]()}
+                <Button title="Save Changes" onPress = {this.saveChanges}/>
+
         </View>
     }
 
