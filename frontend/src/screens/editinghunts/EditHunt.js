@@ -1,7 +1,9 @@
 import React, {PureComponent} from 'react';
 import {View, Text, TextInput, FlatList, StyleSheet, Button} from 'react-native';
 import {widthPercentageToDP as wp} from 'react-native-responsive-screen';
-import ItemGrid from '../../library/components/ItemGrid';
+import GlobalStyles from '../../library/utils/globalStyles';
+//Prob change name later to just gird.
+import Grid from '../../library/components/Grid';
 import FenceList from '../../library/components/FenceList';
 
 export default class EditHuntScreen extends PureComponent{
@@ -34,7 +36,7 @@ export default class EditHuntScreen extends PureComponent{
         //need to  keep key as well. In actual production will be uid
         this.state = {
 
-            name: hunt.name,
+            title: hunt.title,
             items:hunt.items,
             fences:hunt.fences,
             currentTab:this.tabs[0].key
@@ -59,20 +61,21 @@ export default class EditHuntScreen extends PureComponent{
 
         this.updateTab = this.updateTab.bind(this);
         this.openMapView = this.openMapView.bind(this);
+        this.saveChanges = this.saveChanges.bind(this);
     }
 
 
     saveChanges(){
 
-        const {name, items, fences } = this.state;
+        const {title, items, fences } = this.state;
         
         const updatedHunt = {
-            name,
+            title,
             items,
             fences
         };
 
-        this.props.navigation.getParam("updateHunt")(updatedHunt);
+        this.props.navigation.getParam("updateHunt")(updatedHunt, this.props.navigation.getParam("hunt"));
     }
 
     updateTab(tab){
@@ -86,7 +89,7 @@ export default class EditHuntScreen extends PureComponent{
     onUpdateName(text){
 
         this.setState({
-            name:text
+            title:text
         });
 
     }
@@ -158,7 +161,8 @@ export default class EditHuntScreen extends PureComponent{
 
         this.props.navigation.navigate("EditItem", {
 
-            item
+            item,
+            fences:this.state.fences
         });
     }
 
@@ -183,8 +187,8 @@ export default class EditHuntScreen extends PureComponent{
         //Okay, so the 'this' objec
         console.log(JSON.stringify(this.state));
         return <View>
-            <TextInput style = {styles.nameField} onChangeText = {this.onUpdateName} />
-            <Text> {this.state.name} </Text>
+            <TextInput style = {GlobalStyles.textField} onChangeText = {this.onUpdateName} />
+            <Text> {this.state.title} </Text>
  
 
         </View>
@@ -197,7 +201,10 @@ export default class EditHuntScreen extends PureComponent{
 
     renderItemGrid(){
 
-        return <ItemGrid items = {this.state.items} onPressItem = {this.onEditItem}/>
+        return <Grid items = {this.state.items} keyExtractor = {(item) => item.name} onPressItem = {this.onEditItem} 
+        itemStyle = {styles.item} itemRender = {(item) =>  <Text>
+            {item.name}
+        </Text>}/>
 
     }
 
@@ -244,11 +251,13 @@ const styles = StyleSheet.create({
     },
 
     //Make this into a styled component
-    nameField:{
+   
+    item:{
+        width:wp('20%'),
+        height:50,
+        borderWidth:5,
+        borderColor:'gray'
 
-        height:40,
-        borderColor:'gray',
-        borderWidth:1
     },
 
     fences:{

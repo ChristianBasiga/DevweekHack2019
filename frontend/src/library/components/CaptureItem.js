@@ -1,8 +1,9 @@
 
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {StyleSheet} from 'react-native';
-import Camera from 'react-native-camera';
+import {View,Text, TouchableOpacity, StyleSheet} from 'react-native';
+import {RNCamera as Camera} from 'react-native-camera';
+import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 
 
 
@@ -11,40 +12,57 @@ export default class CaptureItem extends Component{
     constructor(props){
 
         super(props);
-        this.takePicture.bind(this);
+        this.takePicture = this.takePicture.bind(this);
+        this.bindCamera = this.bindCamera.bind(this);
     }
 
-     takePicture(){
+    async takePicture() {
 
-        this.camera.takePictureAsync({
-            base64:true,
-            //Then after they process the picture, will resume it, will
-            //pass in ref's function address to call.
-            pauseAfterCapture: true
-        })
-        .then (picture => {
+        if (this.camera != null){
+            const picture = await this.camera.takePictureAsync({
+                base64:true,
+                
+                //Then after they process the picture, will resume it, will
+                //pass in ref's function address to call.
+                pauseAfterCapture: false
+            });
 
-            this.props.onCapture(this.camera.resumePreview, picture);
+            
+            this.props.onCapture(picture);
 
-        })            
-        .catch (err => {
+         
+        }
 
-            console.log("Failed to take picture");
-        })
+    }
+
+    bindCamera(ref){
+
+        this.camera = ref;
 
     }
 
     render(){
 
         return (<View style = {styles.container}>
-            <Camera ref  = {this.camera = ref} style ={styles.preview}/>
+            <Camera ref  = {this.bindCamera} style ={styles.preview}
+            
+            type={Camera.Constants.Type.back}
+            flashMode={Camera.Constants.FlashMode.on}
+            permissionDialogTitle={'Permission to use camera'}
+            permissionDialogMessage={'We need your permission to use your camera phone'}
+            
+            >
             {/*Overlay maybe from capturing item to create hunt or for being in hunt*/}
-            {this.props.overlay}
-            <View style={{ flex: 0, flexDirection: 'row', justifyContent: 'center' }}>
-                <TouchableOpacity onPress={this.takePicture} style={styles.capture}>
-                    <Text style={{ fontSize: 14 }}> CAPTURE </Text>
-                </TouchableOpacity>
-             </View>
+
+
+                {this.props.renderOverlay()}
+                <View style = {{flex:1, justifyContent:'center'}}>
+                        <TouchableOpacity onPress={this.takePicture} style={styles.capture}>
+                            <Text style={{ fontSize: 14 }}> CAPTURE </Text>
+                        </TouchableOpacity>
+                </View>
+             </Camera>
+           
 
         </View>);
     }
@@ -54,20 +72,26 @@ export default class CaptureItem extends Component{
 CaptureItem.propTypes = {
 
     onCapture : PropTypes.func.isRequired,
-    overlay : PropTypes.element.isRequired
+    renderOverlay : PropTypes.func,
 }
 
 const styles = StyleSheet.create({
 
     container: {
-        flex: 1,
-        flexDirection: 'column',
-        backgroundColor: 'black',
+        width:wp('100%'),
+        height:hp('100%')
       },
     preview: {
         flex: 1,        
-        justifyContent: 'flex-end',
         alignItems: 'center',
+        justifyContent:'flex-end'
+        
+    },
+
+    overlay:{
+
+        justifyContent:'flex-start'
+        
     },
 
     capture: {

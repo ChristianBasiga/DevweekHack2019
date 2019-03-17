@@ -31,12 +31,14 @@ export default class FenceList extends Component{
         />
     }
 
+    keyExtractor = (item,idx) => item.name;
     render(){
 
         return <FlatList
         
             data = {this.props.fences}
             renderItem = {this.renderFenceElement}
+            keyExtractor = {this.keyExtractor}
 
         />
 

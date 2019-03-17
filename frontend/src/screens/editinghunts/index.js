@@ -15,7 +15,7 @@ export default class EditHuntsScreen extends Component{
 
             hunts : [
 
-                {title:"hunt1", items: [ {name:"item"}], fences: [{name:"fence"}]},
+                {title:"hunt1", items: [ {name:"item"},  {name:"item2"}], fences: [{name:"fence"}]},
                 {title:"hunt2"}
 
             ],
@@ -27,13 +27,15 @@ export default class EditHuntsScreen extends Component{
 
     }
 
-    updateHunt(hunt){
+    updateHunt(hunt,original){
 
         this.setState(state => {
 
             //Prob easier if made it a map, keyed by name, but this is fine.
-            const rest = state.hunts.filter(h => h.name !== hunt.name);
+            const rest = state.hunts.filter(h => h.title !== original.title);
+            console.log(JSON.stringify(state.hunts));
 
+            console.log(JSON.stringify(rest));
             const huntsWithUpdate = rest.concat(hunt);
 
             return {
